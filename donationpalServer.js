@@ -4,11 +4,11 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const helmet = require('helmet');
 
 const mongoose = require('mongoose');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const passport = require('passport');
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -37,14 +37,28 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3001',
+    credentials: true
+}));
 app.use(limiter);
+app.use(helmet());
 
 // Routes
 app.use('/api', indexRouter);
 app.use('/campaigns', campaignsRouter);
 app.use('/donations', donationsRouter);
 app.use('/users', usersRouter);
+
+// Error Handling Middleware
+app.use((err, req, res, next) => {
+        if (err.name === 'UnauthorizedError') {
+        // Handle JWT authentication errors
+            res.status(401).json({ message: 'Invalid token' });
+        } else {
+            next(err);
+        }
+    });
 
 // Connect to MongoDB
 mongoose.set('strictQuery', false);

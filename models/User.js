@@ -4,35 +4,140 @@ const Schema = mongoose.Schema;
 
 // create a user schema
 const UserSchema = new Schema({
-    
-    email : {
+
+    gender: {
         type : String,
-        required : true,
-        unique : true
+        trim : true
     },
-    password : {
+    name: {
+        title: {
+            type : String,
+            trim : true
+        },
+        first : {
+            type : String,
+            // required : true,
+            trim : true
+        },
+        last : {
+            type : String,
+            // required : true,
+            trim : true
+        }
+    },
+    location: {
+        street : {
+            number : {
+                type : Number,
+                trim : true
+            },
+            name : {
+                type : String,
+                trim : true
+            }
+        },
+        city : {
+            type : String,
+            trim : true
+        },
+        state : {
+            type : String,
+            trim : true
+        },
+        country : {
+            type : String,
+            trim : true
+        },
+        postcode : {
+            type : Number,
+            trim : true
+        },
+        coordinates : {
+            latitude : {
+                type : String,
+                trim : true
+            },
+            longitude : {
+                type : String,
+                trim : true
+            }
+        },
+        timezone : {
+            offset : {
+                type : String,
+                trim : true
+            },
+            description : {
+                type : String,
+                trim : true
+            }
+        }
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+    },
+    dob: {
+        date : {
+            type : Date
+        },
+        age : {
+            type : Number
+        }
+    },
+    phone: {
         type : String,
-        required : true
+        trim : true
+    },
+    picture: {
+        large : {
+            type : String
+        },
+        medium : {
+            type : String
+        },
+        thumbnail : {
+            type : String
+        }
     },
     nat: {
         type : String,
-        required: true
+        trim : true
+    },
+    password: {
+        type : String,
+        required : true
     }
 });
 
 // Create a pre hook that will run auto with this router
 UserSchema.pre('save', async function (next) {
-    const user = this;
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
-    next();
+
+    if (this.isModified('password')) {
+        try {
+            const saltRounds = 10;
+            const hash = await bcrypt.hash(this.password, saltRounds);
+            this.password = hash;
+            next();
+        } catch (error) {
+            next(error);
+        }
+    } else {
+        next();
+    }
+
 });
 
-// decrybet so the web can read it
-UserSchema.methods.isValidPassword = async function (encryptePassword) {
-    const user = this;
-    const compare = await bcrypt.compare(encryptePassword, user.password);
-    return compare;
+// decrypt so the web can read it and check it
+UserSchema.methods.isValidPassword = async function (encryptPassword) {
+    try {
+        return await bcrypt.compare(encryptPassword, this.password);
+    } catch (error) {
+        throw error;
+    }
 }
 
 mongoose.model('users', UserSchema)

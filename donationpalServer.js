@@ -39,7 +39,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors({
     // origin: 'http://localhost:3001',
-    origin: 'https://kariemgerges.github.io/donationPal-frontend/',
+    origin: 'https://kariemgerges.github.io',
     credentials: true
 }));
 app.use(limiter);

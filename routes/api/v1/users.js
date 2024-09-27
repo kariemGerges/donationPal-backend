@@ -92,6 +92,8 @@ router.post(
     [
         body('email').isEmail().withMessage('Please enter a valid email'),
         body('password').exists().withMessage('You Know there should be a password, right?'),
+        // body('password').matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/).withMessage('Password must contain at least 8 characters, one letter, and one number')
+
     ],
     async (req, res) => {
         // validate the input
@@ -111,14 +113,15 @@ router.post(
             // create a JWT token
             const payload = { sub : user._id };
             const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: '15m',
+                expiresIn: '30m',
             });
 
             // store the token in a cookie
             res.cookie('jwt', token, {
                 httpOnly: true,    // Ensures the cookie is not accessible via JavaScript
-                secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
-                sameSite: 'lax', // Ensures the cookie is only sent with cross-site requests secured
+                secure: false, // testing prod
+                // secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
+                sameSite: 'strict', // Ensures the cookie is only sent with cross-site requests secured
                 maxAge: 1000 * 60 * 15, // 15 minutes
             });
 
@@ -139,7 +142,7 @@ router.post('/logout', (req, res) => {
     res.clearCookie('jwt', {
         httpOnly: true,    // Ensures the cookie is not accessible via JavaScript
         secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
-        sameSite: 'lax', // Ensures the cookie is only sent with cross-site requests secured
+        sameSite: 'strict', // Ensures the cookie is only sent with cross-site requests secured
         }
     );
     res.status(200).json({ message: 'User logged out successfully' });

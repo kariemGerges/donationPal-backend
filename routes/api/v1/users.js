@@ -118,7 +118,7 @@ router.post(
             res.cookie('jwt', token, {
                 httpOnly: true,    // Ensures the cookie is not accessible via JavaScript
                 secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
-                sameSite: 'strict', // Ensures the cookie is only sent with cross-site requests secured
+                sameSite: 'lax', // Ensures the cookie is only sent with cross-site requests secured
                 maxAge: 1000 * 60 * 15, // 15 minutes
             });
 
@@ -139,7 +139,7 @@ router.post('/logout', (req, res) => {
     res.clearCookie('jwt', {
         httpOnly: true,    // Ensures the cookie is not accessible via JavaScript
         secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
-        sameSite: 'strict', // Ensures the cookie is only sent with cross-site requests secured
+        sameSite: 'lax', // Ensures the cookie is only sent with cross-site requests secured
         }
     );
     res.status(200).json({ message: 'User logged out successfully' });

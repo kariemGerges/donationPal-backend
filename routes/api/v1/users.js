@@ -119,10 +119,10 @@ router.post(
             // store the token in a cookie
             res.cookie('jwt', token, {
                 httpOnly: true,    // Ensures the cookie is not accessible via JavaScript
-                secure: false, // testing prod
+                secure: true, // testing prod
                 // secure: process.env.NODE_ENV === 'production', // Ensures the cookie is only sent over HTTPS only if the app is deployed in production
-                sameSite: 'strict', // Ensures the cookie is only sent with cross-site requests secured
-                maxAge: 1000 * 60 * 15, // 15 minutes
+                sameSite: 'none', // Ensures the cookie is only sent with cross-site requests secured
+                maxAge: 1000 * 60 * 30, // 30 minutes
             });
 
             res.status(200).json({
